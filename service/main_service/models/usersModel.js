@@ -11,7 +11,7 @@ const createUser = async (data) => {
   const insertSql = `
     INSERT INTO users (
       uid, google_id, nik, name, email, email_verified_at, password,
-      role_structure, role_access, role, status, image, contact, address, created_at
+      role, status, image, contact, address, created_at
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
   `;
   const insertParams = [
@@ -22,8 +22,6 @@ const createUser = async (data) => {
     data.email,
     data.email_verified_at || null,
     hashedPassword,
-    data.role_structure || null,
-    data.role_access || null,
     data.role || null,
     data.status || 4,
     data.image || null,
@@ -33,7 +31,7 @@ const createUser = async (data) => {
 
   const selectSql = `
     SELECT uid, google_id, nik, name, email, email_verified_at,
-           role_structure, role_access, role, status, image,
+         role, status, image,
            contact, address
     FROM users WHERE uid = ?
   `;
@@ -50,13 +48,9 @@ const findByEmail = async (email) => {
 const findAllById = async (uid) => {
   let sql = `SELECT 
       u.*, 
-      rs.rs_name, 
-      ra.ra_name, 
       r.role_name,
       s.status_name
     FROM users u
-    LEFT JOIN role_structure rs ON u.role_structure = rs.rs_id
-    LEFT JOIN role_access ra ON u.role_access = ra.ra_id
     LEFT JOIN role r ON u.role = r.role_id
     LEFT JOIN status s ON u.status = s.id
     Where 1=1 And u.uid = ${uid}`;
@@ -78,13 +72,9 @@ const findAll = async () => {
   const sql = `
     SELECT 
       u.*, 
-      rs.rs_name, 
-      ra.ra_name, 
       r.role_name,
       s.status_name
     FROM users u
-    LEFT JOIN role_structure rs ON u.role_structure = rs.rs_id
-    LEFT JOIN role_access ra ON u.role_access = ra.ra_id
     LEFT JOIN role r ON u.role = r.role_id
     LEFT JOIN status s ON u.status = s.id
     ORDER BY u.created_at ASC
@@ -94,10 +84,8 @@ const findAll = async () => {
 
 const findBy = async (filters) => {
   let query = `
-    SELECT u.*, rs.rs_name, ra.ra_name, r.role_name, s.status_name
+    SELECT u.*, r.role_name, s.status_name
     FROM users u
-    LEFT JOIN role_structure rs ON u.role_structure = rs.rs_id
-    LEFT JOIN role_access ra ON u.role_access = ra.ra_id
     LEFT JOIN role r ON u.role = r.role_id
     LEFT JOIN status s ON u.status = s.id
   `;
@@ -166,8 +154,7 @@ const update = async (id, data) => {
   const sql = `
     UPDATE users SET
       google_id = ?, nik = ?, name = ?, email = ?, email_verified_at = ?,
-      password = COALESCE(?, password),
-      role_structure = ?, role_access = ?, role = ?,
+      password = COALESCE(?, password), role = ?,
       status = ?, image = ?, contact = ?, address = ?, updated_at = NOW()
     WHERE id = ?
   `;
@@ -179,8 +166,6 @@ const update = async (id, data) => {
     data.email,
     data.email_verified_at || null,
     hashedPassword,
-    data.role_structure || null,
-    data.role_access || null,
     data.role || null,
     statusId,
     data.image || null,
