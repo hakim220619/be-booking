@@ -65,7 +65,7 @@ router.put(
 router.delete("/users/:id", authenticateToken, userController.deleteUser);
 
 // User Menus
-router.get("/menus", authenticateToken, menusController.getAllMenus);
+router.get("/menus", menusController.getAllMenus);
 router.post("/menus", authenticateToken, menusController.createMenu);
 router.get("/menus/:id", authenticateToken, menusController.getMenuById);
 router.put("/menus/:id", authenticateToken, menusController.updateMenu);
@@ -86,7 +86,7 @@ router.put("/status/:id", authenticateToken, statusController.updateStatus);
 router.delete("/status/:id", authenticateToken, statusController.deleteStatus);
 
 // Aplikasi
-router.get("/aplikasi", authenticateToken, aplikasiController.getAllAplikasies);
+router.get("/aplikasi", aplikasiController.getAllAplikasies);
 router.post("/aplikasi", authenticateToken, aplikasiController.createAplikasi);
 router.get(
   "/aplikasi/:id",

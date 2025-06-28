@@ -29,10 +29,10 @@ const createAplikasi = async (data) => {
 
 const findAll = async () => {
     const sql = `
-        SELECT id, owner, address, contact, title, name, logo, copyright, version, whatsapp_token, updated_at
+        SELECT *
         FROM aplikasi ORDER BY updated_at ASC
     `;
-    return await queryAll(sql);
+    return await queryOne(sql);
 };
 
 const findBy = async (filters) => {

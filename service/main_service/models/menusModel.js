@@ -17,11 +17,56 @@ const createMenu = async (data) => {
     const newMenu = await queryInsertAndGet(insertSql, insertParams, selectSql);
     return { data: newMenu };
 };
-
 const findAll = async () => {
-    const sql = 'SELECT * FROM menu ORDER BY order_list ASC';
-    return await queryAll(sql);
+    const sql = `
+      SELECT 
+        m.id AS menu_id,
+        m.key AS \`key\`,
+        m.label AS menu_label,
+        m.url,
+        mi.label AS item_label,
+        mi.url AS item_url
+      FROM 
+        menus m
+      LEFT JOIN 
+        menu_items mi ON mi.menu_id = m.id
+      WHERE 
+        m.is_active = 1 AND (mi.is_active = 1 OR mi.is_active IS NULL)
+      ORDER BY 
+        m.sort_order ASC, mi.sort_order ASC
+    `;
+
+    const rows = await queryAll(sql);
+
+    // Strukturkan data menjadi grouped format
+    const menuMap = {};
+
+    for (const row of rows) {
+        const key = row.key;
+
+        if (!menuMap[key]) {
+            menuMap[key] = {
+                key: key,
+                label: row.menu_label,
+                url: row.url,
+                items: [],
+            };
+        }
+
+        if (row.item_label && row.item_url) {
+            menuMap[key].items.push({
+                label: row.item_label,
+                url: row.item_url,
+            });
+        }
+    }
+
+    // Convert map ke array
+    const menuData = Object.values(menuMap);
+    return menuData;
 };
+
+
 
 const findBy = async (id) => {
     const sql = 'SELECT * FROM menu WHERE id = ?';
